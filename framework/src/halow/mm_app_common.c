@@ -159,10 +159,33 @@ void app_wlan_start(void)
     status = mmwlan_sta_enable(&sta_args, sta_status_callback);
     MMOSAL_ASSERT(status == MMWLAN_SUCCESS);
 
-    /* Wait for link status callback.
+    /* Wait for link status callback with timeout.
      * Use a binary semaphore to block us until Link is up.
      */
-    mmosal_semb_wait(link_established, UINT32_MAX);
+    bool link_up = mmosal_semb_wait(link_established, 30000);  /* 30 second timeout */
+
+    if (!link_up)
+    {
+        printf("WARNING: Semaphore timeout waiting for link up callback\n");
+        printf("Checking if we have IP address anyway...\n");
+
+        /* Check if we actually have an IP address despite callback not firing */
+        struct mmipal_ip_config ip_config;
+        if (mmipal_get_ip_config(&ip_config) == MMIPAL_SUCCESS)
+        {
+            if (strcmp(ip_config.ip_addr, "0.0.0.0") != 0)
+            {
+                printf("SUCCESS: We have IP address %s despite callback timeout!\n", ip_config.ip_addr);
+                printf("Netmask: %s, Gateway: %s\n", ip_config.netmask, ip_config.gateway_addr);
+                /* Continue anyway since we have connectivity */
+            }
+            else
+            {
+                printf("ERROR: No IP address assigned!\n");
+                MMOSAL_ASSERT(false);
+            }
+        }
+    }
 
     /* Wi-Fi link is now established, return to caller */
 }
