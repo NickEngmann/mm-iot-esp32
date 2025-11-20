@@ -29,6 +29,10 @@
 #include "esp_http_server.h"
 #include "esp_log.h"
 #include "esp_event.h"
+#include "driver/gpio.h"
+
+/** Onboard LED GPIO pin (inverted: LOW=ON, HIGH=OFF) */
+#define LED_GPIO 21
 
 
 /*
@@ -321,6 +325,65 @@ static httpd_handle_t server = NULL;
 /** TAG for logging */
 static const char *TAG = "halow_webserver";
 
+/** LED state (true = ON, false = OFF) */
+static bool led_state = false;
+
+/**
+ * Initialize the onboard LED
+ */
+static void led_init(void)
+{
+    gpio_config_t io_conf = {
+        .pin_bit_mask = (1ULL << LED_GPIO),
+        .mode = GPIO_MODE_OUTPUT,
+        .pull_up_en = GPIO_PULLUP_DISABLE,
+        .pull_down_en = GPIO_PULLDOWN_DISABLE,
+        .intr_type = GPIO_INTR_DISABLE,
+    };
+    gpio_config(&io_conf);
+
+    /* Turn LED off initially (HIGH = OFF because inverted) */
+    gpio_set_level(LED_GPIO, 1);
+    led_state = false;
+
+    ESP_LOGI(TAG, "LED initialized on GPIO%d", LED_GPIO);
+}
+
+/**
+ * Set LED state
+ */
+static void led_set(bool on)
+{
+    /* LED is inverted: LOW=ON, HIGH=OFF */
+    gpio_set_level(LED_GPIO, on ? 0 : 1);
+    led_state = on;
+    ESP_LOGI(TAG, "LED turned %s", on ? "ON" : "OFF");
+}
+
+/**
+ * Toggle LED state
+ */
+static void led_toggle(void)
+{
+    led_set(!led_state);
+}
+
+/**
+ * Blink LED a few times (demo function)
+ */
+static void led_blink_demo(void)
+{
+    ESP_LOGI(TAG, "LED blink demo starting...");
+    for (int i = 0; i < 5; i++)
+    {
+        led_set(true);
+        mmosal_task_sleep(200);
+        led_set(false);
+        mmosal_task_sleep(200);
+    }
+    ESP_LOGI(TAG, "LED blink demo complete");
+}
+
 /**
  * HTTP GET handler for root path
  */
@@ -336,6 +399,14 @@ static esp_err_t root_get_handler(httpd_req_t *req)
         "h1 { color: #333; }"
         ".info { background: white; padding: 20px; border-radius: 8px; margin: 10px 0; }"
         ".label { font-weight: bold; color: #666; }"
+        ".led-status { display: inline-block; width: 20px; height: 20px; border-radius: 50%%; "
+        "background: %s; border: 2px solid #333; margin-left: 10px; }"
+        ".button { background: #4CAF50; border: none; color: white; padding: 15px 32px; "
+        "text-align: center; text-decoration: none; display: inline-block; font-size: 16px; "
+        "margin: 4px 2px; cursor: pointer; border-radius: 4px; }"
+        ".button:hover { background: #45a049; }"
+        ".blink-btn { background: #008CBA; }"
+        ".blink-btn:hover { background: #007399; }"
         "</style></head>"
         "<body>"
         "<h1>ESP32-S3 Wi-Fi HaLow Web Server</h1>"
@@ -347,16 +418,31 @@ static esp_err_t root_get_handler(httpd_req_t *req)
         "<p><span class='label'>Chip:</span> Morse Micro MM6108A1</p>"
         "</div>"
         "<div class='info'>"
+        "<h2>LED Control</h2>"
+        "<p><span class='label'>LED Status:</span> %s<span class='led-status'></span></p>"
+        "<button class='button' onclick='toggleLED()'>Toggle LED</button>"
+        "<button class='button blink-btn' onclick='blinkLED()'>Blink Demo</button>"
+        "</div>"
+        "<div class='info'>"
         "<p>This device is successfully connected to the network using Sub-GHz Wi-Fi HaLow technology!</p>"
         "</div>"
+        "<script>"
+        "function toggleLED() { fetch('/led/toggle').then(() => location.reload()); }"
+        "function blinkLED() { fetch('/led/blink').then(() => setTimeout(() => location.reload(), 2500)); }"
+        "</script>"
         "</body></html>";
 
     /* Get current IP configuration from mmipal */
     if (mmipal_get_ip_config(&ip_config) == MMIPAL_SUCCESS)
     {
-        char response[1280];
+        char response[2048];
+        const char *led_color = led_state ? "#00ff00" : "#ff0000";
+        const char *led_text = led_state ? "ON" : "OFF";
+
         snprintf(response, sizeof(response), html_page,
-                 ip_config.ip_addr, ip_config.netmask, ip_config.gateway_addr);
+                 led_color,  /* LED indicator color */
+                 ip_config.ip_addr, ip_config.netmask, ip_config.gateway_addr,
+                 led_text);  /* LED status text */
         httpd_resp_send(req, response, HTTPD_RESP_USE_STRLEN);
     }
     else
@@ -365,6 +451,27 @@ static esp_err_t root_get_handler(httpd_req_t *req)
         httpd_resp_send(req, error_msg, HTTPD_RESP_USE_STRLEN);
     }
 
+    return ESP_OK;
+}
+
+/**
+ * HTTP GET handler for LED toggle
+ */
+static esp_err_t led_toggle_handler(httpd_req_t *req)
+{
+    led_toggle();
+    const char *resp = led_state ? "LED ON" : "LED OFF";
+    httpd_resp_send(req, resp, HTTPD_RESP_USE_STRLEN);
+    return ESP_OK;
+}
+
+/**
+ * HTTP GET handler for LED blink demo
+ */
+static esp_err_t led_blink_handler(httpd_req_t *req)
+{
+    led_blink_demo();
+    httpd_resp_send(req, "Blink complete", HTTPD_RESP_USE_STRLEN);
     return ESP_OK;
 }
 
@@ -379,6 +486,26 @@ static const httpd_uri_t root_uri = {
 };
 
 /**
+ * URI handler for LED toggle
+ */
+static const httpd_uri_t led_toggle_uri = {
+    .uri       = "/led/toggle",
+    .method    = HTTP_GET,
+    .handler   = led_toggle_handler,
+    .user_ctx  = NULL
+};
+
+/**
+ * URI handler for LED blink
+ */
+static const httpd_uri_t led_blink_uri = {
+    .uri       = "/led/blink",
+    .method    = HTTP_GET,
+    .handler   = led_blink_handler,
+    .user_ctx  = NULL
+};
+
+/**
  * Start the HTTP server
  */
 static esp_err_t start_webserver(void)
@@ -386,12 +513,15 @@ static esp_err_t start_webserver(void)
     struct mmipal_ip_config ip_config;
     httpd_config_t config = HTTPD_DEFAULT_CONFIG();
     config.lru_purge_enable = true;
+    config.stack_size = 8192;  /* Increase from default 4096 to handle larger HTML */
 
     ESP_LOGI(TAG, "Starting HTTP server on port %d", config.server_port);
 
     if (httpd_start(&server, &config) == ESP_OK)
     {
         httpd_register_uri_handler(server, &root_uri);
+        httpd_register_uri_handler(server, &led_toggle_uri);
+        httpd_register_uri_handler(server, &led_blink_uri);
         ESP_LOGI(TAG, "HTTP server started successfully!");
 
         /* Get and display current IP address */
@@ -420,6 +550,13 @@ void app_main(void)
     /* Initialize ESP event loop (required for HTTP server) */
     ESP_ERROR_CHECK(esp_event_loop_create_default());
 
+    /* Initialize onboard LED */
+    led_init();
+
+    /* Blink LED to show we're starting up */
+    printf("LED startup blink sequence...\n");
+    led_blink_demo();
+
     /* Initialize WLAN and IP stack */
     printf("\n===== Initializing Wi-Fi HaLow Interface =====\n");
     app_wlan_init();
@@ -443,6 +580,10 @@ void app_main(void)
     app_wlan_start();  /* Blocks until connected with IP address */
 
     printf("\n===== Successfully Connected with IP Address! =====\n");
+
+    /* Turn on LED to indicate we're online */
+    led_set(true);
+    printf("LED turned ON - device is online!\n");
 
     /* Start HTTP web server */
     printf("\n===== Starting Web Server =====\n");
