@@ -13,5 +13,8 @@ if(DEFINED COUNTRY_CODE)
     add_compile_definitions(COUNTRY_CODE="${COUNTRY_CODE}")
 endif()
 
+# Use custom partition table with larger app partition (2MB)
+set(PARTITION_CSV_PATH "${CMAKE_CURRENT_LIST_DIR}/partitions.csv")
+
 include($ENV{IDF_PATH}/tools/cmake/project.cmake)
 project(scan)

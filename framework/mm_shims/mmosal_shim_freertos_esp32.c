@@ -105,8 +105,11 @@ static void mmosal_dump_failure_info(void)
 
 void mmosal_impl_assert(void)
 {
-    ets_printf("MMOSAL Assert, CPU %d (current core) backtrace", xPortGetCoreID());
+    ets_printf("MMOSAL Assert, CPU %d (current core) backtrace\n", xPortGetCoreID());
+#if CONFIG_IDF_TARGET_ARCH_XTENSA
+    /* esp_backtrace_print is only available on Xtensa architecture (ESP32-S3) */
     (void)esp_backtrace_print(100);
+#endif
 #ifdef HALT_ON_ASSERT
     if (preserved_failure_info.magic == ASSERT_INFO_MAGIC)
     {

@@ -5,8 +5,7 @@ dependencies:
     idf:
         version: ">=5.1.1"
     mmutils:
-        version: "==2.9.7-esp32"
-        path: ../mmutils
+        override_path: ../mmutils
 description: Morse Micro IP Abstraction Layer
 targets:
     - esp32s3

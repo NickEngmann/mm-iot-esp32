@@ -3,59 +3,60 @@
 menu "Morse Micro Shim Configuration"
     config MM_RESET_N
         int "RESET_N pin for MM chip"
-        default 3
+        default 1
         help
             Output gpio pin used to control the RESET_N line.
 
     config MM_WAKE
         int "WAKE pin for MM chip"
-        default 8
+        default 2
         help
             Output gpio pin used to control the WAKE line.
 
     config MM_BUSY
         int "BUSY pin for the MM chip"
-        default 9
+        default 5
         help
             Input pin used as a rising edge interrupt.
 
     config MM_SPI_SCK
         int "SCK pin for MM chip"
-        default 12
+        default 7
         help
             SPI clock pin.
 
     config MM_SPI_MOSI
         int "MOSI pin for MM chip"
-        default 11
+        default 9
         help
             SPI master out slave in pin.
 
     config MM_SPI_MISO
         int "MISO pin for MM chip"
-        default 13
+        default 8
         help
             SPI master in slave out pin.
 
     config MM_SPI_CS
         int "SPI CS pin for MM chip"
-        default 10
+        default 4
         help
             SPI chip select pin.
 
     config MM_SPI_IRQ
         int "SPI IRQ pin for MM chip"
-        default 5
+        default 3
         help
             Out of band interupt pin used to indicate that
             the MM chip has data for the host.
 
     config MM_BCF_FILE
         string "MM Board Configuration File"
-        default "bcf_mf08651_us.mbin"
+        default "bcf_fgh100mhaamd.mbin"
         help
             Set the name of the BCF (Board Configuration File) to use.
             Example valid filenames include:
+              - bcf_fgh100mhaamd.mbin (Seeed Xiao HaLow / Quectel)
               - bcf_mf08651_us.mbin
               - bcf_mf08551.mbin
               - bcf_mf08251.mbin

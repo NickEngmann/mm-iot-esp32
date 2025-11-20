@@ -24,6 +24,7 @@
 #include "lwip/ip4_frag.h"
 #include "lwip/ip6_frag.h"
 #include "lwip/mem.h"
+#include "lwip/netif.h"
 #include "lwip/sockets.h"
 #include "lwip/stats.h"
 #include "lwip/tcp.h"
@@ -261,7 +262,6 @@ enum mmipal_status mmipal_set_ip6_config(const struct mmipal_ip6_config *config)
 {
     struct mmipal_data *data = mmipal_get_data();
     struct netif *netif = &data->lwip_mmnetif;
-    err_t result;
     unsigned ii;
     ip_addr_t ip6_addr[LWIP_IPV6_NUM_ADDRESSES];
 
@@ -500,11 +500,14 @@ static void tcpip_init_done_handler(void *arg)
     }
 #endif
 
+#if LWIP_NETIF_LINK_CALLBACK
     netif_set_link_callback(netif, netif_status_callback);
+#endif
+#if LWIP_NETIF_STATUS_CALLBACK
     netif_set_status_callback(netif, netif_status_callback);
+#endif
 
 #if LWIP_IPV6
-    err_t result6;
     data->ip6_mode = args->ip6_mode;
     if (args->ip6_mode == MMIPAL_IP6_STATIC)
     {
@@ -519,7 +522,7 @@ static void tcpip_init_done_handler(void *arg)
     else if (data->ip6_mode == MMIPAL_IP6_DHCP6_STATELESS)
 #if LWIP_IPV6_DHCP6
     {
-        result6 = dhcp6_enable_stateless(netif);
+        err_t result6 = dhcp6_enable_stateless(netif);
         LWIP_ASSERT("Stateless DHCP6 start error", result6 == ERR_OK);
     }
 #else

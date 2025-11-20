@@ -2,12 +2,12 @@
 # SPDX-License-Identifier: Apache-2.0
 dependencies:
   mmutils:
-    path: $MMIOT_ROOT/framework/src/mmutils
+    override_path: $MMIOT_ROOT/src/mmutils
   morselib:
-    path: $MMIOT_ROOT/framework/morselib
+    override_path: $MMIOT_ROOT/morselib
   mm_shims:
-    path: $MMIOT_ROOT/framework/mm_shims
+    override_path: $MMIOT_ROOT/mm_shims
   mmipal:
-    path: $MMIOT_ROOT/framework/src/mmipal
+    override_path: $MMIOT_ROOT/src/mmipal
   mmiperf:
-    path: $MMIOT_ROOT/framework/src/mmiperf
+    override_path: $MMIOT_ROOT/src/mmiperf

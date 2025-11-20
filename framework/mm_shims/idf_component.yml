@@ -5,8 +5,7 @@ dependencies:
     idf:
         version: ">=5.1.1"
     mmutils:
-        version: "==2.9.7-esp32"
-        path: ../src/mmutils
+        override_path: ../src/mmutils
 description: Morse Micro shim layers for the esp32s3
 targets:
     - esp32s3

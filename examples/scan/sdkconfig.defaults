@@ -3,3 +3,10 @@ CONFIG_FREERTOS_HZ=1000
 CONFIG_IDF_TARGET="esp32s3"
 
 CONFIG_MBEDTLS_NIST_KW_C=y
+
+# Use custom partition table with 2MB app partition
+CONFIG_PARTITION_TABLE_CUSTOM=y
+CONFIG_PARTITION_TABLE_CUSTOM_FILENAME="partitions.csv"
+
+# Set flash size to 4MB (typical for ESP32-S3 dev boards)
+CONFIG_ESPTOOLPY_FLASHSIZE_4MB=y

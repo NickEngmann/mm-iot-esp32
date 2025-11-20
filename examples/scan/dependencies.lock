@@ -1,0 +1,78 @@
+dependencies:
+  idf:
+    source:
+      type: idf
+    version: 5.1.1
+  mm_shims:
+    dependencies:
+    - name: idf
+      version: '>=5.1.1'
+    - name: mmutils
+      override_path: ../src/mmutils
+    source:
+      path: C:\Users\cyeng\Documents\Projects\kepler51\v3\mm-iot-esp32\framework\mm_shims
+      type: local
+    targets:
+    - esp32s3
+    - esp32c6
+    - esp32c3
+    version: 2.9.7-esp32
+  mmipal:
+    dependencies:
+    - name: idf
+      version: '>=5.1.1'
+    - name: mmutils
+      override_path: ../mmutils
+    source:
+      path: C:\Users\cyeng\Documents\Projects\kepler51\v3\mm-iot-esp32\framework\src\mmipal
+      type: local
+    targets:
+    - esp32s3
+    - esp32c6
+    - esp32c3
+    version: 2.9.7-esp32
+  mmpktmem:
+    dependencies:
+    - name: idf
+      version: '>=5.1.1'
+    source:
+      path: C:\Users\cyeng\Documents\Projects\kepler51\v3\mm-iot-esp32\framework\src\mmpktmem
+      type: local
+    targets:
+    - esp32s3
+    - esp32c6
+    - esp32c3
+    version: 2.9.7-esp32
+  mmutils:
+    dependencies:
+    - name: idf
+      version: '>=5.1.1'
+    source:
+      path: C:\Users\cyeng\Documents\Projects\kepler51\v3\mm-iot-esp32\framework\src\mmutils
+      type: local
+    targets:
+    - esp32s3
+    - esp32c6
+    - esp32c3
+    version: 2.9.7-esp32
+  morselib:
+    dependencies:
+    - name: idf
+      version: '>=5.1.1'
+    - name: mmpktmem
+      override_path: ../src/mmpktmem
+    source:
+      path: C:\Users\cyeng\Documents\Projects\kepler51\v3\mm-iot-esp32\framework\morselib
+      type: local
+    targets:
+    - esp32s3
+    - esp32c6
+    - esp32c3
+    version: 2.9.7-esp32
+direct_dependencies:
+- mm_shims
+- mmipal
+- morselib
+manifest_hash: f19a053b0af05b5bc0f1b4669c087eae83773f379f76c7dd611d68a9132fb7cf
+target: esp32s3
+version: 2.0.0

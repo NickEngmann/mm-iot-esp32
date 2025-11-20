@@ -5,8 +5,7 @@ dependencies:
     idf:
         version: ">=5.1.1"
     mmipal:
-        version: "==2.9.7-esp32"
-        path: ../mmipal
+        override_path: ../mmipal
 description: Morse Micro Iperf implementation
 targets:
     - esp32s3

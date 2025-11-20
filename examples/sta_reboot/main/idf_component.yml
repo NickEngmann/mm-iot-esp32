@@ -1,5 +1,5 @@
 dependencies:
   morselib:
-    path: $MMIOT_ROOT/framework/morselib
+    override_path: $MMIOT_ROOT/morselib
   mm_shims:
-    path: $MMIOT_ROOT/framework/mm_shims
+    override_path: $MMIOT_ROOT/mm_shims
