@@ -1,4 +1,18 @@
 dependencies:
+  halow:
+    dependencies:
+    - name: mmutils
+      override_path: $MMIOT_ROOT/src/mmutils
+    - name: morselib
+      override_path: $MMIOT_ROOT/morselib
+    - name: mm_shims
+      override_path: $MMIOT_ROOT/mm_shims
+    - name: mmipal
+      override_path: $MMIOT_ROOT/src/mmipal
+    source:
+      path: C:\Users\cyeng\Documents\Projects\kepler51\v3\mm-iot-esp32\framework\src\halow
+      type: local
+    version: 0.1.0
   idf:
     source:
       type: idf
@@ -70,9 +84,10 @@ dependencies:
     - esp32c3
     version: 2.9.7-esp32
 direct_dependencies:
+- halow
 - mm_shims
 - mmipal
 - morselib
-manifest_hash: f19a053b0af05b5bc0f1b4669c087eae83773f379f76c7dd611d68a9132fb7cf
+manifest_hash: 5774783240f53e6b303349760313a8023dbc17d2b68005b8f49eede739ef5adc
 target: esp32s3
 version: 2.0.0

@@ -1758,6 +1758,17 @@ CONFIG_MM_FW_FILE="mm6108.mbin"
 # end of Morse Micro Shim Configuration
 
 #
+# Wi-Fi HaLow Connection Manager
+#
+CONFIG_HALOW_COUNTRY_CODE="US"
+CONFIG_HALOW_SSID="halowlink1-31af"
+CONFIG_HALOW_PASSWORD="snowy80skies4carve"
+CONFIG_ENABLE_DHCP=y
+# CONFIG_ENABLE_AUTOCONFIG is not set
+CONFIG_STATIC_LOCAL_IP6="FE80::2"
+# end of Wi-Fi HaLow Connection Manager
+
+#
 # Morse Micro Packet Memory Configuration
 #
 CONFIG_MMPKTMEM_TX_POOL_N_BLOCKS=8

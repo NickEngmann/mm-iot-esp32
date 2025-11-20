@@ -10,3 +10,9 @@ CONFIG_PARTITION_TABLE_CUSTOM_FILENAME="partitions.csv"
 
 # Set flash size to 4MB (typical for ESP32-S3 dev boards)
 CONFIG_ESPTOOLPY_FLASHSIZE_4MB=y
+
+# Wi-Fi HaLow Configuration
+CONFIG_HALOW_COUNTRY_CODE="US"
+CONFIG_HALOW_SSID="halowlink1-31af"
+CONFIG_HALOW_PASSWORD="snowy80skies4carve"
+CONFIG_ENABLE_DHCP=y

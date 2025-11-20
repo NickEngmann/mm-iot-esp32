@@ -1,9 +1,10 @@
 dependencies:
+  mmutils:
+    override_path: $MMIOT_ROOT/src/mmutils
   morselib:
     override_path: $MMIOT_ROOT/morselib
   mm_shims:
     override_path: $MMIOT_ROOT/mm_shims
   mmipal:
     override_path: $MMIOT_ROOT/src/mmipal
-  halow:
-    override_path: $MMIOT_ROOT/src/halow
+version: "0.1.0"
